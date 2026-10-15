@@ -183,6 +183,8 @@ recipe.output.save_file={build.project_name}.{build.variant}.{upload.extension}
 # ---------------------------------
 pluggable_discovery.required.0=builtin:serial-discovery
 pluggable_discovery.required.1=builtin:mdns-discovery
+pluggable_discovery.jlink.pattern="{runtime.tools.korlinx-tool.path}/korlinx-tool" discovery
+pluggable_discovery.jlink.pattern.windows="{runtime.tools.korlinx-tool.path}/korlinx-tool.exe" discovery
 pluggable_monitor.required.serial=builtin:serial-monitor
 
 
@@ -373,21 +375,20 @@ tools.jlink.upload.params.quiet=
 tools.jlink.upload.pattern="{path}/{cmd}" -CommanderScript "{build.path}/flasher.jlink"
 
 #
-# pyOCD (J-Link, CMSIS-DAP, ST-Link): the official pyOCD build, installed as the pyocd tool
-# pyOCD skips flash pages that already hold the same data, so an unchanged loader is not rewritten
+# SEGGER J-Link through korlinx-tool (needs the J-Link Software and Documentation Pack)
 #
 
-tools.pyocd-auto.cmd={runtime.tools.pyocd.path}/pyocd
-tools.pyocd-auto.cmd.windows={runtime.tools.pyocd.path}/pyocd.exe
-tools.pyocd-auto.upload.params.verbose=
-tools.pyocd-auto.upload.params.quiet=
-tools.pyocd-auto.upload.pattern="{cmd}" load -f 4M --target {upload.target} {upload.pyocd_files}
-tools.pyocd-auto.bootloader.params.verbose=
-tools.pyocd-auto.bootloader.params.quiet=
-tools.pyocd-auto.bootloader.pattern="{cmd}" load -f 4M --target {upload.target} {bootloader.pyocd_files}
-tools.pyocd-auto.program.params.verbose=
-tools.pyocd-auto.program.params.quiet=
-tools.pyocd-auto.program.pattern="{cmd}" load -f 4M --target {upload.target} {upload.pyocd_files}
+tools.korlinx-jlink.cmd={runtime.tools.korlinx-tool.path}/korlinx-tool
+tools.korlinx-jlink.cmd.windows={runtime.tools.korlinx-tool.path}/korlinx-tool.exe
+tools.korlinx-jlink.upload.params.verbose=-v
+tools.korlinx-jlink.upload.params.quiet=
+tools.korlinx-jlink.upload.pattern="{cmd}" upload {upload.verbose} -device {upload.jlink_device} -port "{upload.port.address}" {upload.jlink_files}
+tools.korlinx-jlink.bootloader.params.verbose=-v
+tools.korlinx-jlink.bootloader.params.quiet=
+tools.korlinx-jlink.bootloader.pattern="{cmd}" upload {bootloader.verbose} -device {upload.jlink_device} -port "{upload.port.address}" {bootloader.jlink_files}
+tools.korlinx-jlink.program.params.verbose=-v
+tools.korlinx-jlink.program.params.quiet=
+tools.korlinx-jlink.program.pattern="{cmd}" upload {program.verbose} -device {upload.jlink_device} -port "{upload.port.address}" {upload.jlink_files}
 
 
 #

@@ -22,9 +22,9 @@ openocd.program.tool=openocd
 openocd.program.tool.default=openocd
 openocd.program.extra_params=
 
-pyocd.name=pyOCD (J-Link, CMSIS-DAP, ST-Link)
-pyocd.protocol=
-pyocd.program.protocol=
-pyocd.program.tool=pyocd-auto
-pyocd.program.tool.default=pyocd-auto
-pyocd.program.extra_params=
+korlinx-jlink.name=SEGGER J-Link (korlinx-tool)
+korlinx-jlink.protocol=
+korlinx-jlink.program.protocol=
+korlinx-jlink.program.tool=korlinx-jlink
+korlinx-jlink.program.tool.default=korlinx-jlink
+korlinx-jlink.program.extra_params=

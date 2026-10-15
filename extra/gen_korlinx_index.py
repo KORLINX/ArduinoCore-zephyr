@@ -8,7 +8,7 @@ Usage: extra/gen_korlinx_index.py BASE_URL CORE_ARCHIVE [TOOLS_URL TOOL_ARCHIVE.
 
 BASE_URL and TOOLS_URL are where the core and the tool archives are published
 (e.g. GitHub release download URLs). The platform entry comes from
-extra/gen_package_index_json.sh; tool archives are named <tool>-<version>-<host>.tar.bz2 or .zip.
+extra/gen_package_index_json.sh; tool archives are named <tool>-<version>-<host>.tar.bz2 or .tar.gz.
 """
 
 import hashlib
@@ -51,7 +51,7 @@ def main():
 
     tools = {}
     for path in tool_archives:
-        m = re.fullmatch(r"(.+)-(\d+\.\d+\.\d+)-(.+)\.(?:tar\.bz2|zip)", os.path.basename(path))
+        m = re.fullmatch(r"(.+)-(\d+\.\d+\.\d+)-(.+)\.tar\.(?:bz2|gz)", os.path.basename(path))
         if not m:
             sys.exit(f"unexpected tool archive name: {path}")
         name, version, host = m.groups()
