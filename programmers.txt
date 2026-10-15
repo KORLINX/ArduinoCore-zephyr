@@ -27,5 +27,4 @@ pyocd.protocol=
 pyocd.program.protocol=
 pyocd.program.tool=pyocd-auto
 pyocd.program.tool.default=pyocd-auto
-pyocd.program.tool.pyocd=pyocd-probe
 pyocd.program.extra_params=

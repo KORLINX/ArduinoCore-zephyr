@@ -4,10 +4,11 @@
 
 """Build package_korlinx_index.json for the Arduino Boards Manager.
 
-Usage: extra/gen_korlinx_index.py BASE_URL CORE_ARCHIVE > package_korlinx_index.json
+Usage: extra/gen_korlinx_index.py BASE_URL CORE_ARCHIVE [TOOLS_URL TOOL_ARCHIVE...] > package_korlinx_index.json
 
-BASE_URL is where the archive is published (e.g. a GitHub release download URL).
-The platform entry comes from extra/gen_package_index_json.sh.
+BASE_URL and TOOLS_URL are where the core and the tool archives are published
+(e.g. GitHub release download URLs). The platform entry comes from
+extra/gen_package_index_json.sh; tool archives are named <tool>-<version>-<host>.tar.bz2 or .zip.
 """
 
 import hashlib
@@ -30,10 +31,12 @@ def archive_info(path, base_url):
 
 
 def main():
-    if len(sys.argv) != 3:
+    if len(sys.argv) < 3 or len(sys.argv) == 4:
         sys.exit(__doc__)
     base_url = sys.argv[1].rstrip("/")
     core_archive = sys.argv[2]
+    tools_url = sys.argv[3].rstrip("/") if len(sys.argv) > 3 else ""
+    tool_archives = sys.argv[4:]
 
     out = subprocess.run(["extra/gen_package_index_json.sh", "korlinx", core_archive],
                          check=True, capture_output=True, text=True).stdout
@@ -46,6 +49,21 @@ def main():
     platform["version"] = m.group(1)
     platform["help"] = {"online": "https://github.com/KORLINX"}
 
+    tools = {}
+    for path in tool_archives:
+        m = re.fullmatch(r"(.+)-(\d+\.\d+\.\d+)-(.+)\.(?:tar\.bz2|zip)", os.path.basename(path))
+        if not m:
+            sys.exit(f"unexpected tool archive name: {path}")
+        name, version, host = m.groups()
+        tool = tools.setdefault((name, version), {"name": name, "version": version, "systems": []})
+        info = archive_info(path, tools_url)
+        tool["systems"].append({"host": host, **info})
+        # older Arduino IDE and CLI versions only look for i686-mingw32 on Windows
+        if host == "x86_64-mingw32":
+            tool["systems"].append({"host": "i686-mingw32", **info})
+    for name, version in tools:
+        platform["toolsDependencies"].append({"packager": "korlinx", "name": name, "version": version})
+
     index = {"packages": [{
         "name": "korlinx",
         "maintainer": "KORLINX",
@@ -53,7 +71,7 @@ def main():
         "email": "",
         "help": {"online": "https://github.com/KORLINX"},
         "platforms": [platform],
-        "tools": [],
+        "tools": list(tools.values()),
     }]}
     json.dump(index, sys.stdout, indent=2)
     print()

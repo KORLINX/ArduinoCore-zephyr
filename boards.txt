@@ -772,9 +772,8 @@ nx15.build.board=NX15_NRF54L15
 # No bootloader: loader and sketch are written with a SEGGER J-Link
 nx15.upload.tool=pyocd-auto
 nx15.upload.tool.default=pyocd-auto
-nx15.upload.tool.pyocd=pyocd-probe
 nx15.upload.target=nrf54l
-nx15.upload.pyocd_files=--if-changed "{upload.artifacts.loader}" "{upload.artifacts.sketch}@{upload.address}"
+nx15.upload.pyocd_files="{upload.artifacts.loader}" "{upload.artifacts.sketch}@{upload.address}"
 nx15.upload.protocol=
 nx15.upload.transport=
 nx15.upload.use_1200bps_touch=false
@@ -783,7 +782,6 @@ nx15.upload.native_usb=false
 
 nx15.bootloader.tool=pyocd-auto
 nx15.bootloader.tool.default=pyocd-auto
-nx15.bootloader.tool.pyocd=pyocd-probe
 nx15.programmer.default=pyocd
 nx15.bootloader.pyocd_files="{upload.artifacts.loader}"
 nx15.bootloader.file=zephyr-{build.variant}.hex

@@ -183,8 +183,6 @@ recipe.output.save_file={build.project_name}.{build.variant}.{upload.extension}
 # ---------------------------------
 pluggable_discovery.required.0=builtin:serial-discovery
 pluggable_discovery.required.1=builtin:mdns-discovery
-pluggable_discovery.pyocd.pattern=python3 "{runtime.platform.path}/tools/pyocd_discovery.py"
-pluggable_discovery.pyocd.pattern.windows=python "{runtime.platform.path}/tools/pyocd_discovery.py"
 pluggable_monitor.required.serial=builtin:serial-monitor
 
 
@@ -375,32 +373,21 @@ tools.jlink.upload.params.quiet=
 tools.jlink.upload.pattern="{path}/{cmd}" -CommanderScript "{build.path}/flasher.jlink"
 
 #
-# pyOCD (J-Link, CMSIS-DAP, ST-Link). pyOCD is installed by the user and found on PATH;
+# pyOCD (J-Link, CMSIS-DAP, ST-Link): the official pyOCD build, installed as the pyocd tool
+# pyOCD skips flash pages that already hold the same data, so an unchanged loader is not rewritten
 #
 
-tools.pyocd-probe.cmd=python3
-tools.pyocd-probe.cmd.windows=python
-tools.pyocd-probe.upload.params.verbose=
-tools.pyocd-probe.upload.params.quiet=
-tools.pyocd-probe.upload.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -u "{upload.port.address}" -f 4M --target {upload.target} {upload.pyocd_files}
-tools.pyocd-probe.bootloader.params.verbose=
-tools.pyocd-probe.bootloader.params.quiet=
-tools.pyocd-probe.bootloader.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -u "{upload.port.address}" -f 4M --target {upload.target} {bootloader.pyocd_files}
-tools.pyocd-probe.program.params.verbose=
-tools.pyocd-probe.program.params.quiet=
-tools.pyocd-probe.program.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -u "{upload.port.address}" -f 4M --target {upload.target} {upload.pyocd_files}
-
-tools.pyocd-auto.cmd=python3
-tools.pyocd-auto.cmd.windows=python
+tools.pyocd-auto.cmd={runtime.tools.pyocd.path}/pyocd
+tools.pyocd-auto.cmd.windows={runtime.tools.pyocd.path}/pyocd.exe
 tools.pyocd-auto.upload.params.verbose=
 tools.pyocd-auto.upload.params.quiet=
-tools.pyocd-auto.upload.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -f 4M --target {upload.target} {upload.pyocd_files}
+tools.pyocd-auto.upload.pattern="{cmd}" load -f 4M --target {upload.target} {upload.pyocd_files}
 tools.pyocd-auto.bootloader.params.verbose=
 tools.pyocd-auto.bootloader.params.quiet=
-tools.pyocd-auto.bootloader.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -f 4M --target {upload.target} {bootloader.pyocd_files}
+tools.pyocd-auto.bootloader.pattern="{cmd}" load -f 4M --target {upload.target} {bootloader.pyocd_files}
 tools.pyocd-auto.program.params.verbose=
 tools.pyocd-auto.program.params.quiet=
-tools.pyocd-auto.program.pattern="{cmd}" "{runtime.platform.path}/tools/pyocd_upload.py" -f 4M --target {upload.target} {upload.pyocd_files}
+tools.pyocd-auto.program.pattern="{cmd}" load -f 4M --target {upload.target} {upload.pyocd_files}
 
 
 #
