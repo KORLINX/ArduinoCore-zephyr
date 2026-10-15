@@ -1,0 +1,19 @@
+# Copyright (c) 2026 Korlinx
+# SPDX-License-Identifier: Apache-2.0
+
+identifier: nx15/nrf54l15/cpuapp
+name: Korlinx-NX-nRF54L15-Application
+type: mcu
+arch: arm
+toolchain:
+  - gnuarmemb
+  - zephyr
+sysbuild: true
+ram: 188
+flash: 1428
+supported:
+  - adc
+  - gpio
+  - i2c
+  - spi
+  - watchdog

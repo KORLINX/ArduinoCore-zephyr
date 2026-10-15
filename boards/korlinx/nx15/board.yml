@@ -1,0 +1,6 @@
+board:
+  name: nx15
+  full_name: Korlinx NX (nRF54L15)
+  vendor: korlinx
+  socs:
+    - name: nrf54l15

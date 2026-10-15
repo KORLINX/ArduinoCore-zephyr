@@ -1,0 +1,168 @@
+/*
+ * Copyright (c) 2026 KORLINX
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/*
+ * RRAM layout. The NX15 has no bootloader, so the Arduino loader starts at
+ * 0x0, where the nRF54L15 boots; it is flashed with a J-Link.
+ *
+ * 0x00000000 Arduino loader (384 kB)
+ * 0x00060000 User sketch    (1104 kB)
+ * 0x00174000 Storage        (36 kB, from the SoC partition file)
+ */
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+
+&cpuapp_rram {
+	partitions {
+		code_partition: partition@0 {
+			compatible = "zephyr,mapped-partition";
+			label = "code";
+			reg = <0x00000000 0x00060000>;
+		};
+
+		user_sketch: partition@60000 {
+			compatible = "zephyr,mapped-partition";
+			label = "user";
+			reg = <0x00060000 0x00114000>;
+		};
+	};
+};
+
+&pinctrl {
+	pwm20_default: pwm20_default {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 1, 9)>;
+		};
+	};
+
+	pwm20_sleep: pwm20_sleep {
+		group1 {
+			psels = <NRF_PSEL(PWM_OUT0, 1, 9)>;
+			low-power-enable;
+		};
+	};
+};
+
+&pwm20 {
+	status = "okay";
+	pinctrl-0 = <&pwm20_default>;
+	pinctrl-1 = <&pwm20_sleep>;
+	pinctrl-names = "default", "sleep";
+};
+
+/* Header analog inputs J3-1..J3-5 (AIN0-AIN4) */
+&adc {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	channel@1 {
+		reg = <1>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN0>; /* P1.04 */
+		zephyr,resolution = <10>;
+	};
+
+	channel@2 {
+		reg = <2>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN1>; /* P1.05 */
+		zephyr,resolution = <10>;
+	};
+
+	channel@3 {
+		reg = <3>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN2>; /* P1.06 */
+		zephyr,resolution = <10>;
+	};
+
+	channel@4 {
+		reg = <4>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN3>; /* P1.07 */
+		zephyr,resolution = <10>;
+	};
+
+	channel@5 {
+		reg = <5>;
+		zephyr,gain = "ADC_GAIN_1_4";
+		zephyr,reference = "ADC_REF_INTERNAL";
+		zephyr,acquisition-time = <ADC_ACQ_TIME_DEFAULT>;
+		zephyr,input-positive = <NRF_SAADC_AIN4>; /* P1.11 */
+		zephyr,resolution = <10>;
+	};
+
+	/* channel@0 (AIN7, P1.14, battery) comes from the board dts */
+};
+
+/ {
+	chosen {
+		zephyr,code-partition = &code_partition;
+	};
+
+	zephyr,user {
+		/* Header pins, LEDs, button and I2C use the same Arduino numbers as
+		 * the NX40 (pin N there is P0.N/P1.(N-32)); the other GPIOs fill
+		 * the free numbers. All 32 GPIOs of the nRF54L15-CAAA are listed.
+		 */
+		digital-pin-gpios = <&gpio1 0 0>,	/*  0 P1.00 XL1 */
+				    <&gpio1 1 0>,	/*  1 P1.01 XL2 */
+				    <&gpio1 4 0>,	/*  2 P1.04 J3-1 A0 */
+				    <&gpio1 5 0>,	/*  3 P1.05 J3-2 A1 */
+				    <&gpio1 6 0>,	/*  4 P1.06 J3-3 A2 */
+				    <&gpio1 7 0>,	/*  5 P1.07 J3-4 A3 */
+				    <&gpio2 2 0>,	/*  6 P2.02 SDA */
+				    <&gpio1 10 0>,	/*  7 P1.10 button */
+				    <&gpio0 4 0>,	/*  8 P0.04 blue LED */
+				    <&gpio1 2 0>,	/*  9 P1.02 J5-4 NFC1 */
+				    <&gpio1 3 0>,	/* 10 P1.03 J5-5 NFC2 */
+				    <&gpio1 9 0>,	/* 11 P1.09 red LED */
+				    <&gpio2 4 0>,	/* 12 P2.04 IMU INT1 */
+				    <&gpio2 0 0>,	/* 13 P2.00 charge status */
+				    <&gpio2 1 0>,	/* 14 P2.01 run LED */
+				    <&gpio2 6 0>,	/* 15 P2.06 charger CE */
+				    <&gpio2 7 0>,	/* 16 P2.07 HICHG / SWO */
+				    <&gpio2 5 0>,	/* 17 P2.05 IMU CS */
+				    <&gpio2 10 0>,	/* 18 P2.10 module flash MOSI */
+				    <&gpio2 3 0>,	/* 19 P2.03 green LED */
+				    <&gpio2 8 0>,	/* 20 P2.08 J5-6 */
+				    <&gpio1 12 0>,	/* 21 P1.12 Serial RX */
+				    <&gpio1 13 0>,	/* 22 P1.13 Serial TX */
+				    <&gpio1 15 0>,	/* 23 P1.15 SCL */
+				    <&gpio0 0 0>,	/* 24 P0.00 module flash WP */
+				    <&gpio0 1 0>,	/* 25 P0.01 module flash MISO */
+				    <&gpio0 2 0>,	/* 26 P0.02 module flash CS */
+				    <&gpio0 3 0>,	/* 27 P0.03 module flash HOLD */
+				    <&gpio1 11 0>,	/* 28 P1.11 J3-5 A4 */
+				    <&gpio1 8 0>,	/* 29 P1.08 J3-6 */
+				    <&gpio2 9 0>,	/* 30 P2.09 module flash SCK */
+				    <&gpio1 14 0>;	/* 31 P1.14 VBAT */
+
+		/* A0-A4 = J3-1..J3-5, A5 = battery (PIN_VBAT) */
+		adc-pin-gpios = <&gpio1 4 0>, <&gpio1 5 0>, <&gpio1 6 0>, <&gpio1 7 0>,
+				<&gpio1 11 0>, <&gpio1 14 0>;
+		io-channels = <&adc 1>, <&adc 2>, <&adc 3>, <&adc 4>, <&adc 5>, <&adc 0>;
+
+		/* Red LED, P1.09, active high */
+		builtin-led-gpios = <&gpio1 9 0>;
+
+		/* analogWrite() on the red LED; PWM20 can only drive port 1 pins */
+		pwm-pin-gpios = <&gpio1 9 0>;
+		pwms = <&pwm20 0 255 PWM_POLARITY_NORMAL>;
+
+		serials = <&uart20>; /* 'Serial' through the on-board USB-UART (FT234XD) */
+		i2cs = <&i2c21>;     /* 'Wire': SDA P2.02, SCL P1.15 */
+	};
+};

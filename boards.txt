@@ -742,3 +742,48 @@ ventunoq.bootloader.tool=remoteocd
 ventunoq.bootloader.tool.default=remoteocd
 ventunoq.bootloader.file=zephyr-{build.variant}.elf
 ventunoq.bootloader.target=stm32h5f5xx
+
+##########################################################################################
+
+nx15.name=KORLINX NX15 (nRF54L15)
+nx15.build.core=arduino
+nx15.build.crossprefix=arm-zephyr-eabi-
+nx15.build.compiler_path={runtime.tools.arm-zephyr-eabi-1.0.1.path}/bin/
+
+nx15.menu.debug.false=Standard
+nx15.menu.debug.true=Debug
+nx15.menu.debug.true.build.zsk_args.debug=-debug
+
+nx15.menu.link_mode.dynamic=Dynamic
+nx15.menu.link_mode.static=Static
+nx15.menu.link_mode.static.build.link_mode=static
+nx15.menu.link_mode.static.upload.extension=bin-zsk.bin
+
+nx15.build.zephyr_target=nx15/nrf54l15/cpuapp
+nx15.build.zephyr_args=
+nx15.build.zephyr_hals=hal_nordic
+nx15.build.zephyr_toolchain=arm-zephyr-eabi
+nx15.build.artifact=korlinx
+nx15.build.variant=nx15_nrf54l15_cpuapp
+nx15.build.extra_flags=
+nx15.build.postbuild.cmd="{tools.imgtool.path}/{tools.imgtool.cmd}" exit
+nx15.build.board=NX15_NRF54L15
+
+# No bootloader: loader and sketch are written with a SEGGER J-Link
+nx15.upload.tool=pyocd-auto
+nx15.upload.tool.default=pyocd-auto
+nx15.upload.tool.pyocd=pyocd-probe
+nx15.upload.target=nrf54l
+nx15.upload.pyocd_files=--if-changed "{upload.artifacts.loader}" "{upload.artifacts.sketch}@{upload.address}"
+nx15.upload.protocol=
+nx15.upload.transport=
+nx15.upload.use_1200bps_touch=false
+nx15.upload.wait_for_upload_port=false
+nx15.upload.native_usb=false
+
+nx15.bootloader.tool=pyocd-auto
+nx15.bootloader.tool.default=pyocd-auto
+nx15.bootloader.tool.pyocd=pyocd-probe
+nx15.programmer.default=pyocd
+nx15.bootloader.pyocd_files="{upload.artifacts.loader}"
+nx15.bootloader.file=zephyr-{build.variant}.hex

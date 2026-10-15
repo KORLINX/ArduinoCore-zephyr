@@ -21,3 +21,11 @@ openocd.protocol=SWD
 openocd.program.tool=openocd
 openocd.program.tool.default=openocd
 openocd.program.extra_params=
+
+pyocd.name=pyOCD (J-Link, CMSIS-DAP, ST-Link)
+pyocd.protocol=
+pyocd.program.protocol=
+pyocd.program.tool=pyocd-auto
+pyocd.program.tool.default=pyocd-auto
+pyocd.program.tool.pyocd=pyocd-probe
+pyocd.program.extra_params=
