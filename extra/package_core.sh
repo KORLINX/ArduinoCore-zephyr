@@ -65,6 +65,18 @@ cat platform.txt > ${TEMP_PLATFORM}
 [ -z "$ARTIFACT_NAME" ] || sed -ie "s/^name=.*/name=${ARTIFACT_NAME}/" ${TEMP_PLATFORM}
 sed -i -e "s/^version=.*/version=$(extra/get_core_version.sh)/" ${TEMP_PLATFORM}
 
+# package.json lets KORLINX-PlatformIO install the same archive
+TEMP_PKGJSON=$(mktemp -p . | sed 's/\.\///')
+cat > ${TEMP_PKGJSON} << EOF
+{
+  "name": "framework-arduino-korlinx-zephyr",
+  "version": "$(extra/get_core_version.sh)",
+  "description": "KORLINX Arduino Zephyr core, the same core the Arduino IDE installs as korlinx:zephyr",
+  "homepage": "https://github.com/KORLINX/ArduinoCore-zephyr",
+  "license": "Apache-2.0"
+}
+EOF
+
 declutter_file() {
 	# remove comments, whitespace at EOL, '/' dir terminators and empty lines
 	[ -f "$1" ] || return 0
@@ -75,6 +87,7 @@ declutter_file() {
 TEMP_INC=$(mktemp -p . | sed 's/\.\///')
 echo ${TEMP_BOARDS} >> ${TEMP_INC}
 echo ${TEMP_PLATFORM} >> ${TEMP_INC}
+echo ${TEMP_PKGJSON} >> ${TEMP_INC}
 declutter_file extra/artifacts/_common.inc >> ${TEMP_INC}
 declutter_file extra/artifacts/$ARTIFACT.inc >> ${TEMP_INC}
 # $ARTIFACT.only should not be included to prevent duplicates with common
@@ -100,8 +113,13 @@ mkdir -p $(dirname ${OUTPUT_FILE})
 tar -cjhf ${OUTPUT_FILE} -X ${TEMP_EXC} -T ${TEMP_INC} \
 	--transform "s,${TEMP_BOARDS},boards.txt," \
 	--transform "s,${TEMP_PLATFORM},platform.txt," \
+	--transform "s,${TEMP_PKGJSON},package.json," \
 	--transform "s,^,ArduinoCore-zephyr/,"
-rm -f ${TEMP_INC} ${TEMP_EXC} ${TEMP_BOARDS} ${TEMP_PLATFORM}
+rm -f ${TEMP_INC} ${TEMP_EXC} ${TEMP_BOARDS} ${TEMP_PLATFORM} ${TEMP_PKGJSON}
+
+# PlatformIO treats a github.com URL that does not end in .zip, .tar.gz or
+# .tar.xz as a git repository, so publish the same tar as .tar.gz too
+bzip2 -dc ${OUTPUT_FILE} | gzip -9n > ${OUTPUT_FILE%.tar.bz2}.tar.gz
 
 log_msg endgroup
 
