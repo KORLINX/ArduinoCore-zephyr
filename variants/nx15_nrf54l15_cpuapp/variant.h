@@ -18,7 +18,7 @@
 
 #define PIN_BUTTON1 7 /* P1.10, active low */
 
-// Serial (uart20, on-board USB-UART) and Wire (i2c21) pins
+// Serial (uart20, on-board USB-UART) and Wire (bit-banged I2C) pins
 #define PIN_SERIAL_RX 21 /* P1.12 */
 #define PIN_SERIAL_TX 22 /* P1.13 */
 #define SDA 6  /* P2.02 */

@@ -163,6 +163,6 @@
 		pwms = <&pwm20 0 255 PWM_POLARITY_NORMAL>;
 
 		serials = <&uart20>; /* 'Serial' through the on-board USB-UART (FT234XD) */
-		i2cs = <&i2c21>;     /* 'Wire': SDA P2.02, SCL P1.15 */
+		i2cs = <&i2c_gpio>;  /* 'Wire': SDA P2.02, SCL P1.15, bit-banged */
 	};
 };
