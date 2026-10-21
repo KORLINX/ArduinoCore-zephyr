@@ -158,9 +158,13 @@
 		/* Red LED, P1.09, active high */
 		builtin-led-gpios = <&gpio1 9 0>;
 
-		/* analogWrite() on the red LED; PWM20 can only drive port 1 pins */
+		/*
+		 * analogWrite() on the red LED; PWM20 can only drive port 1 pins.
+		 * The period is in ns of a 16 MHz clock, so 255 would leave only
+		 * 4 counts; 500 Hz gives 32000.
+		 */
 		pwm-pin-gpios = <&gpio1 9 0>;
-		pwms = <&pwm20 0 255 PWM_POLARITY_NORMAL>;
+		pwms = <&pwm20 0 PWM_HZ(500) PWM_POLARITY_NORMAL>;
 
 		serials = <&uart20>; /* 'Serial' through the on-board USB-UART (FT234XD) */
 		i2cs = <&i2c_gpio>;  /* 'Wire': SDA P2.02, SCL P1.15, bit-banged */
