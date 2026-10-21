@@ -62,7 +62,7 @@ sed -i '/^$/N;/^\n$/D' $TEMP_BOARDS
 # create a temporary platform.txt file with the correct version
 TEMP_PLATFORM=$(mktemp -p . | sed 's/\.\///')
 cat platform.txt > ${TEMP_PLATFORM}
-[ -z "$ARTIFACT_NAME" ] || sed -ie "s/^name=.*/name=${ARTIFACT_NAME}/" ${TEMP_PLATFORM}
+[ -z "$ARTIFACT_NAME" ] || sed -i -e "s/^name=.*/name=${ARTIFACT_NAME}/" ${TEMP_PLATFORM}
 sed -i -e "s/^version=.*/version=$(extra/get_core_version.sh)/" ${TEMP_PLATFORM}
 
 # package.json lets KORLINX-PlatformIO install the same archive
