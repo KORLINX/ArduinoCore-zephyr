@@ -165,26 +165,33 @@
 	};
 };
 
-&i2c21 {
-	status = "okay";
-	pinctrl-0 = <&i2c21_default>;
-	pinctrl-1 = <&i2c21_sleep>;
-	pinctrl-names = "default", "sleep";
-	clock-frequency = <I2C_BITRATE_STANDARD>;
+/ {
+	/*
+	 * The on-board I2C bus, SDA P2.02 and SCL P1.15. The nRF54L15 TWIM
+	 * peripherals cannot use port 2 pins, so the bus is bit-banged.
+	 */
+	i2c_gpio: i2c-gpio {
+		compatible = "gpio-i2c";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		sda-gpios = <&gpio2 2 (GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
+		scl-gpios = <&gpio1 15 (GPIO_OPEN_DRAIN | GPIO_PULL_UP)>;
+		clock-frequency = <I2C_BITRATE_STANDARD>;
 
-	shtc3: shtc3@70 {
-		compatible = "sensirion,shtc3", "sensirion,shtcx";
-		status = "okay";
-		reg = <0x70>;
-		measure-mode = "normal";
-		clock-stretching;
-	};
+		shtc3: shtc3@70 {
+			compatible = "sensirion,shtc3", "sensirion,shtcx";
+			status = "okay";
+			reg = <0x70>;
+			measure-mode = "normal";
+			clock-stretching;
+		};
 
-	lsm6dsl: lsm6dsl@6a {
-		compatible = "st,lsm6dsl";
-		status = "okay";
-		reg = <0x6a>;
-		irq-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;
+		lsm6dsl: lsm6dsl@6a {
+			compatible = "st,lsm6dsl";
+			status = "okay";
+			reg = <0x6a>;
+			irq-gpios = <&gpio2 4 GPIO_ACTIVE_HIGH>;
+		};
 	};
 };
 
